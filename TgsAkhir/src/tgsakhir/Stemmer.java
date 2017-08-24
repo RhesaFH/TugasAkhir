@@ -5,10 +5,7 @@
  */
 package tgsakhir;
 import static org.apache.lucene.analysis.util.StemmerUtil.*;
-/**
- *
- * @author Rhesa
- */
+
 public class Stemmer {
   private int numSyllables;
   private int flags;

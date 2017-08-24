@@ -11,13 +11,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import static jdk.nashorn.internal.objects.ArrayBufferView.length;
 
 /**
  *
@@ -27,9 +24,9 @@ class Format {
 
     DecimalFormat df = new DecimalFormat("#.##");
     private String word1;
-    private ArrayList<Words> KataTerkait1List;
+    private ArrayList<Words> KataTemp1List;
     private String word2;
-    private ArrayList<Words> KataTerkait2List;
+    private ArrayList<Words> KataTemp2List;
     private float goldStandard;
     private float vectorScore;
     private float X;
@@ -40,11 +37,11 @@ class Format {
     private float banyak;
     private float vectorWord1;
     private float vectorWord2;
-    boolean tfidf = false, kemunculan = false, sinonim = false, arti = false;
+    boolean stop = false, tfidf = false, sinonim = false, arti = false;
 
     public Format() {
-        this.KataTerkait1List = new ArrayList<>();
-        this.KataTerkait2List = new ArrayList<>();
+        this.KataTemp1List = new ArrayList<>();
+        this.KataTemp2List = new ArrayList<>();
         this.word1 = "";
         this.word2 = "";
         this.goldStandard = (float) 0.0;
@@ -52,15 +49,15 @@ class Format {
     }
 
     public Format(String word1, String word2, float goldStandard) {
-        this.KataTerkait1List = new ArrayList<>();
-        this.KataTerkait2List = new ArrayList<>();
+        this.KataTemp1List = new ArrayList<>();
+        this.KataTemp2List = new ArrayList<>();
         this.word1 = word1;
         this.word2 = word2;
         goldStandard = goldStandard;
         this.goldStandard = goldStandard;
     }
 
-    public void addRelatedWordForWord1(String word) { //nyimpen nilai definisi kata 1
+    public void simpanDaftarKata1(String word) { //nyimpen nilai definisi kata 1
         boolean isInList = false;
         Pattern p = Pattern.compile("^[a-zA-Z0-9]+$");
         Matcher m = p.matcher(word);
@@ -71,46 +68,22 @@ class Format {
             i = m.start() + 1;
         }
         if (i != 0) {
-            for (Words KataTerkait : KataTerkait1List) {
-                if (word.equals(KataTerkait.getWord())) {
+            for (Words KataTemp : KataTemp1List) {
+                if (word.equals(KataTemp.getWord())) {
                     //System.out.println(word);
                     isInList = true;
-                    KataTerkait.increaseTotal();
+                    KataTemp.increaseTotal();
                 }
             }
 
             if (!isInList) {
-                this.KataTerkait1List.add(new Words(word));
+                this.KataTemp1List.add(new Words(word));
             }
         }
 
     }
-public void addRelatedWordForWord11(String word) { //nyimpen nilai definisi kata 1
-        boolean isInList = false;
-        Pattern p = Pattern.compile("^[a-zA-Z0-9]+$");
-        Matcher m = p.matcher(word);
-        String hasil = "";
-        int i = 0;
-        while (m.find(i)) {
-            hasil = hasil + m.group() + "\n";
-            i = m.start() + 1;
-        }
-        if (i != 0) {
-            for (Words KataTerkait : KataTerkait1List) {
-                if (word.equals(KataTerkait.getWord())) {
-                    //System.out.println(word);
-                    isInList = true;
-                    KataTerkait.setTotal((float) (KataTerkait.getTotal()+0.3));
-                }
-            }
 
-            if (!isInList) {
-                this.KataTerkait1List.add(new Words(word));
-            }
-        }
-
-    }
-    public void addRelatedWordForWord2(String word) { //nyimpen nilai definisi kata 2
+    public void simpanDaftarKata2(String word) { //nyimpen nilai definisi kata 2
         boolean isInList = false;
         Pattern p = Pattern.compile("^[a-zA-Z0-9.-]+$");
         Matcher m = p.matcher(word);
@@ -121,41 +94,19 @@ public void addRelatedWordForWord11(String word) { //nyimpen nilai definisi kata
             i = m.start() + 1;
         }
         if (i != 0) {
-            for (Words KataTerkait : KataTerkait2List) {
-                if (word.equals(KataTerkait.getWord())) {
+            for (Words KataTemp : KataTemp2List) {
+                if (word.equals(KataTemp.getWord())) {
                     //System.out.println(word);
                     isInList = true;
-                    KataTerkait.increaseTotal();
+                    KataTemp.increaseTotal();
                 }
             }
             if (!isInList) {
-                this.KataTerkait2List.add(new Words(word));
+                this.KataTemp2List.add(new Words(word));
             }
         }
     }
-public void addRelatedWordForWord22(String word) { //nyimpen nilai definisi kata 2
-        boolean isInList = false;
-        Pattern p = Pattern.compile("^[a-zA-Z0-9.-]+$");
-        Matcher m = p.matcher(word);
-        String hasil = "";
-        int i = 0;
-        while (m.find(i)) {
-            hasil = hasil + m.group() + "\n";
-            i = m.start() + 1;
-        }
-        if (i != 0) {
-            for (Words KataTerkait : KataTerkait2List) {
-                if (word.equals(KataTerkait.getWord())) {
-                    //System.out.println(word);
-                    isInList = true;
-                    KataTerkait.setTotal((float) (KataTerkait.getTotal()+0.3));
-                }
-            }
-            if (!isInList) {
-                this.KataTerkait2List.add(new Words(word));
-            }
-        }
-    }
+
     public String getWord1() {
         return word1;
     }
@@ -165,11 +116,11 @@ public void addRelatedWordForWord22(String word) { //nyimpen nilai definisi kata
     }
 
     public ArrayList<Words> getRelatedWord1List() {
-        return KataTerkait1List;
+        return KataTemp1List;
     }
 
-    public void setRelatedWord1List(ArrayList<Words> KataTerkait1List) {
-        this.KataTerkait1List = KataTerkait1List;
+    public void setRelatedWord1List(ArrayList<Words> KataTemp1List) {
+        this.KataTemp1List = KataTemp1List;
     }
 
     public String getWord2() {
@@ -181,11 +132,11 @@ public void addRelatedWordForWord22(String word) { //nyimpen nilai definisi kata
     }
 
     public ArrayList<Words> getRelatedWord2List() {
-        return KataTerkait2List;
+        return KataTemp2List;
     }
 
-    public void setRelatedWord2List(ArrayList<Words> KataTerkait2List) {
-        this.KataTerkait2List = KataTerkait2List;
+    public void setRelatedWord2List(ArrayList<Words> KataTemp2List) {
+        this.KataTemp2List = KataTemp2List;
     }
 
     public float getGoldStandard() {
@@ -229,14 +180,14 @@ public void addRelatedWordForWord22(String word) { //nyimpen nilai definisi kata
         System.out.println("\n");
     }
 
-    public void HitungNilaiVektor(Idf idf, boolean tfidf, boolean sinonim, boolean arti){ //hitung nilai vektor
+    public void HitungNilaiVektor(Idf idf, boolean tfidf, boolean sinonim, boolean arti, boolean stop){ //hitung nilai vektor
         this.tfidf = tfidf;
-        this.kemunculan = kemunculan;
         this.sinonim = sinonim;
         this.arti = arti;
+        this.stop = stop;
         
         HashMap<String, Float> hashmap = new HashMap<String, Float>();
-        if (sinonim == false){   // ambil nilai idf yang telah disimpan di file txt
+        if (sinonim == false && stop == true){   // ambil nilai idf yang telah disimpan di file txt
             try
             {
                BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("src/idf.txt")));
@@ -253,10 +204,44 @@ public void addRelatedWordForWord22(String word) { //nyimpen nilai definisi kata
                }
                br.close();
             }catch (IOException e){}            
-        } else if (sinonim == true){
+        } else if (sinonim == true && stop == true){
             try
             {
                BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("src/idfsinonim.txt")));
+               String l;
+               while((l = br.readLine()) != null)
+               {
+                  String[] args = l.split("[,]", 2);
+                  if(args.length != 2)continue;
+                  String p = args[0].replaceAll(" ", "");
+                  String b = args[1].replaceAll(" ", "");
+                  float q = Float.parseFloat(b);
+                  hashmap.put(p, q);
+                  
+               }
+               br.close();
+            }catch (IOException e){}             
+        } else if (sinonim == false && stop == false){
+            try
+            {
+               BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("src/idfnonstop.txt")));
+               String l;
+               while((l = br.readLine()) != null)
+               {
+                  String[] args = l.split("[,]", 2);
+                  if(args.length != 2)continue;
+                  String p = args[0].replaceAll(" ", "");
+                  String b = args[1].replaceAll(" ", "");
+                  float q = Float.parseFloat(b);
+                  hashmap.put(p, q);
+                  
+               }
+               br.close();
+            }catch (IOException e){}             
+        } else if (sinonim == true && stop == false){
+            try
+            {
+               BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("src/idfsinnonstop.txt")));
                String l;
                while((l = br.readLine()) != null)
                {
@@ -275,35 +260,36 @@ public void addRelatedWordForWord22(String word) { //nyimpen nilai definisi kata
         Map<String, Float> nilaiIdf = hashmap; // nilai idf = nilai pada file txt yg telah dibaca
         
         ArrayList<String> temporaryWord1 = new ArrayList<>();
-        for (Words relword11 : KataTerkait1List) {
-            temporaryWord1.add(relword11.getWord());
+        for (Words dftKata1 : KataTemp1List) {
+            temporaryWord1.add(dftKata1.getWord());
         }
 
         ArrayList<String> temporaryWord2 = new ArrayList<>();
-        for (Words relword21 : KataTerkait2List) {
-            temporaryWord2.add(relword21.getWord());
+        for (Words dftKata2 : KataTemp2List) {
+            temporaryWord2.add(dftKata2.getWord());
         }
 
         temporaryWord1.removeAll(temporaryWord2);
         temporaryWord1.addAll(temporaryWord2);
         System.out.println("token yang ada : "+temporaryWord1);
         
-        ArrayList<Words> VektorKataTerkait = new ArrayList<>();
+        ArrayList<Words> VektorKataTemp = new ArrayList<>();
         for (String word : temporaryWord1) {
-            VektorKataTerkait.add(new Words(word, 0));
+            VektorKataTemp.add(new Words(word, 0));
         }
         
-        for (Words VKT : VektorKataTerkait) {
-            for (Words KataTerkait1 : KataTerkait1List) {
-                if (VKT.getWord().equals(KataTerkait1.getWord())) {
+        for (Words VKT : VektorKataTemp) {
+            for (Words KataTemp1 : KataTemp1List) {
+                if (VKT.getWord().equals(KataTemp1.getWord())) {
                     if (tfidf == true) {
                         for (Map.Entry<String, Float> ceck : nilaiIdf.entrySet()) {
                             String d = ceck.getKey();
                             float s = ceck.getValue();
-                            if (KataTerkait1.getWord().equals(d)) { //hitung tfidf token kata1
-                                System.out.println("token1 "+KataTerkait1.getWord() + " TFIDF : " + KataTerkait1.getTotal() + " * " + s);
-                                KataTerkait1.setTotal(KataTerkait1.getTotal() * s);                              
-                                VKT.setTotal(KataTerkait1.getTotal());
+                            if (KataTemp1.getWord().equals(d)) { //hitung tfidf token kata1
+                                KataTemp1.setTotal((float) (1 + Math.log(KataTemp1.getTotal())));
+                                System.out.println("token1 "+KataTemp1.getWord() + " TFIDF : " + KataTemp1.getTotal() + " * " + s);
+                                KataTemp1.setTotal(KataTemp1.getTotal() * s);                              
+                                VKT.setTotal(KataTemp1.getTotal());
                             }
                         }
                     }
@@ -311,27 +297,27 @@ public void addRelatedWordForWord22(String word) { //nyimpen nilai definisi kata
             }
         }
 
-        for (Words VKT : VektorKataTerkait) {
+        for (Words VKT : VektorKataTemp) {
             boolean isSame = false;
-            for (Words KataTerkait2 : KataTerkait2List) {
-                if (VKT.getWord().equals(KataTerkait2.getWord())) {
+            for (Words KataTemp2 : KataTemp2List) {
+                if (VKT.getWord().equals(KataTemp2.getWord())) {
                     isSame = true;
                     if (tfidf == true) {
                         for (Map.Entry<String, Float> ceck : nilaiIdf.entrySet()) {
                             String d = ceck.getKey();
                             float s = ceck.getValue();
-                            if (KataTerkait2.getWord().equals(d)) { //hitung tfidf token kata2
-                                KataTerkait2.setTotal((float) (1 + Math.log(KataTerkait2.getTotal())));
-                                System.out.println("token2 "+KataTerkait2.getWord() + " TFIDF : " + KataTerkait2.getTotal() + " * " + s);
-                                KataTerkait2.setTotal(KataTerkait2.getTotal() * s);
+                            if (KataTemp2.getWord().equals(d)) { //hitung tfidf token kata2
+                                KataTemp2.setTotal((float) (1 + Math.log(KataTemp2.getTotal())));
+                                System.out.println("token2 "+KataTemp2.getWord() + " TFIDF : " + KataTemp2.getTotal() + " * " + s);
+                                KataTemp2.setTotal(KataTemp2.getTotal() * s);
                             }
                         }
 
                         if (VKT.getTotal() != 0) { // jika ada token yang sama pada kata1 dan kata2
                         System.out.println("");
-                        System.out.println("token yang sama : "+VKT.getWord() + " " + KataTerkait2.getTotal() + " " + VKT.getTotal());
+                        System.out.println("token yang sama : "+VKT.getWord() + " " + KataTemp2.getTotal() + " * " + VKT.getTotal());
                         System.out.println("");
-                        VKT.setTotal(KataTerkait2.getTotal() * VKT.getTotal());
+                        VKT.setTotal(KataTemp2.getTotal() * VKT.getTotal());
 
                             break;
                         }
@@ -344,17 +330,17 @@ public void addRelatedWordForWord22(String word) { //nyimpen nilai definisi kata
             }
         }
 
-        float totalVectorRelated = HitungTFIDFSama(VektorKataTerkait);
+        float totalVectorRelated = hitJumlTokenSama(VektorKataTemp);
 
         System.out.println("Total nilai TFIDF1.TFIDF2 : " + totalVectorRelated);
         System.out.println("----------------------------------------------------------");
  
         
-        vectorWord1 = HitungTokenKata(word1, KataTerkait1List);
+        vectorWord1 = hitJumlTokenKata(word1, KataTemp1List);
         System.out.println("Panjang Vektor kata "+word1+": " + vectorWord1);
         System.out.println("----------------------------------------------------------");
         
-        vectorWord2 = HitungTokenKata(word2, KataTerkait2List);
+        vectorWord2 = hitJumlTokenKata(word2, KataTemp2List);
         System.out.println("Panjang Vektor kata "+word2+": " + vectorWord2);
         System.out.println("----------------------------------------------------------");
         
@@ -367,7 +353,7 @@ public void addRelatedWordForWord22(String word) { //nyimpen nilai definisi kata
         System.out.println();
     }
 
-    private float HitungTFIDFSama(ArrayList<Words> relatedwordList) { // hitung tfidf1.tfidf2
+    private float hitJumlTokenSama(ArrayList<Words> relatedwordList) { // hitung jumlah token yang sama
         float total = 0;
         int juml = 0;
         System.out.println("----------------------------------------------------------");
@@ -385,23 +371,16 @@ public void addRelatedWordForWord22(String word) { //nyimpen nilai definisi kata
         return total;
     }
 
-    private float HitungTokenKata(String word, ArrayList<Words> relatedwordList) { //memunculkan token tfidf dari kata
+    private float hitJumlTokenKata(String word, ArrayList<Words> relatedwordList) { //menghitung jumalh token
         float total = 0;
         int juml = 0;
         System.out.print("Token TFIDF " + word + " : ");
         for (Words relatedwordList1 : relatedwordList) {
-            if (kemunculan == true) {
-                total += Math.pow(1, 2);
-                System.out.print(relatedwordList1.getWord() + " : " + df.format(1) + ", ");
-            } else {
                 total += Math.pow(relatedwordList1.getTotal(), 2);
                 System.out.print(relatedwordList1.getWord() + " : " + df.format(relatedwordList1.getTotal()) + ", ");
-            }
-
+            
             juml++;
-
         }
-
         System.out.println();
         System.out.println("Jumlah Token yang tersedia = " + juml);
         return (float) Math.sqrt(total);

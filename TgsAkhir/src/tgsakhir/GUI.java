@@ -5,15 +5,10 @@
  */
 package tgsakhir;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
@@ -25,7 +20,7 @@ import org.xml.sax.SAXException;
 public class GUI extends javax.swing.JFrame {
 
     private Idf idf = null;
-    boolean sinonim = false, arti = false, tfidf = true, bobot = false, kemunculan = false;
+    boolean sinonim = false, arti = false, tfidf = true, bobot = false, stop = false;
     float temp = -1;
 
     /**
@@ -38,10 +33,10 @@ public class GUI extends javax.swing.JFrame {
 
     }
 
-    public void Ngitung(boolean sinonim, boolean arti, boolean tfidf) {
+    public void HitIDF(boolean sinonim, boolean arti, boolean tfidf, boolean stop) {
         
             try {
-                idf = new Idf(sinonim, arti,tfidf);
+                idf = new Idf(sinonim, arti,tfidf,stop);
             } catch (ParserConfigurationException ex) {
                 Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
@@ -50,17 +45,15 @@ public class GUI extends javax.swing.JFrame {
                 Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
             } catch (InterruptedException ex) {
                 Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        
+            }     
     }
 
-    public void loadData(boolean sinonim, boolean arti, boolean tfidf) {
+    public void loadData(boolean sinonim, boolean arti, boolean tfidf, boolean stop) {
 
         Tf tf = null;
-
         
         try {
-            tf = new Tf(this.idf, sinonim, arti, tfidf);
+            tf = new Tf(this.idf, sinonim, arti, tfidf,stop);
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(GUI.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
@@ -135,7 +128,7 @@ public class GUI extends javax.swing.JFrame {
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(123, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addComponent(judul)
@@ -158,7 +151,7 @@ public class GUI extends javax.swing.JFrame {
         jLabel3.setText("Pilih data pengujian");
 
         pildata.setMaximumRowCount(2);
-        pildata.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Definisi", "Definisi+Sinonim" }));
+        pildata.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Definisi", "Definisi+Sinonim", "Definisi tanpa stopwords", "Definisi+Sinonim tanpa stopwords" }));
         pildata.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 pildataActionPerformed(evt);
@@ -226,39 +219,40 @@ public class GUI extends javax.swing.JFrame {
             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(36, 36, 36)
-                .addComponent(hitidf)
-                .addGap(56, 56, 56)
-                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(correlation, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 78, Short.MAX_VALUE)
-                .addComponent(calculate, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(20, 20, 20))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pildata, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
-                .addGap(215, 215, 215))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(calculate, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(correlation, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(pildata, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(hitidf)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(4, 4, 4)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(9, 9, 9)
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pildata, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(pildata, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(hitidf))
+                .addGap(23, 23, 23)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(calculate)
-                    .addComponent(hitidf)
                     .addComponent(correlation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(calculate))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -273,7 +267,7 @@ public class GUI extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 24, Short.MAX_VALUE))
+                .addGap(0, 20, Short.MAX_VALUE))
         );
 
         pack();
@@ -282,18 +276,30 @@ public class GUI extends javax.swing.JFrame {
     private void calculateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calculateActionPerformed
 
         if (pildata.getSelectedIndex() == 0) {
-            System.out.println("Definisi Selected");
+            System.out.println("Definisi");
             sinonim = false;
             arti = true;
+            stop = true;
         } else if (pildata.getSelectedIndex() == 1) {
-            System.out.println("Sinonim Selected");
+            System.out.println("Definisi + sinonim");
             sinonim = true;
             arti = true;
+            stop = true;
+        } else if (pildata.getSelectedIndex() == 2) {
+            System.out.println("Definisi tanpa stopwords");
+            sinonim = false;
+            arti = true;
+            stop = false;
+        } else if (pildata.getSelectedIndex() == 3) {
+            System.out.println("Definisi + sinonim tanpa stopwords");
+            sinonim = true;
+            arti = true;
+            stop = false;
         }
-
-        loadData(sinonim, arti, tfidf);
+        loadData(sinonim, arti, tfidf, stop);
         sinonim = false;
         arti = false;
+        stop = false;
         tfidf = true;
 
     }//GEN-LAST:event_calculateActionPerformed
@@ -309,18 +315,31 @@ public class GUI extends javax.swing.JFrame {
     private void hitidfActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_hitidfActionPerformed
         // TODO add your handling code here:
         if (pildata.getSelectedIndex() == 0) {
-            System.out.println("Definisi Selected");
+            System.out.println("Definisi");
             sinonim = false;
             arti = true;
+            stop = true;
         } else if (pildata.getSelectedIndex() == 1) {
-            System.out.println("Sinonim Selected");
+            System.out.println("Definisi + sinonim");
             sinonim = true;
             arti = true;
+            stop = true;
+        } else if (pildata.getSelectedIndex() == 2) {
+            System.out.println("Definisi tanpa stopwords");
+            sinonim = false;
+            arti = true;
+            stop = false;
+        } else if (pildata.getSelectedIndex() == 3) {
+            System.out.println("Definisi + sinonim tanpa stopwords");
+            sinonim = true;
+            arti = true;
+            stop = false;
         }
         
-        Ngitung(sinonim, arti, tfidf);
+        HitIDF(sinonim, arti, tfidf, stop);
         sinonim = false;
         arti = false;
+        stop = false;
         tfidf = true;
     }//GEN-LAST:event_hitidfActionPerformed
 
